@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -11,10 +12,20 @@ type Light interface {
 }
 
 func newLight(lCfg *lightConfig) (Light, error) {
-	switch {
-	case lCfg.GPIO != nil:
-		return newGPIOLight(lCfg.GPIO.Number)
+	switch lCfg.Type {
+	case "debug":
+		l := &debugLight{}
+		if err := json.Unmarshal(lCfg.Config, l); err != nil {
+			return nil, err
+		}
+		return l, nil
+	case "gpio":
+		c := &gpioConfig{}
+		if err := json.Unmarshal(lCfg.Config, c); err != nil {
+			return nil, err
+		}
+		return newGPIOLight(c.Number)
 	default:
-		return nil, errors.New("invalid light configuration")
+		return nil, errors.New("invalid light type")
 	}
 }
