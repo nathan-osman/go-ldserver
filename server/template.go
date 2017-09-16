@@ -49,6 +49,16 @@ const pageHTML = `
     <body>
         <h2>ldserver</h2>
         <p>Use the tools below to interact with the server.</p>
+        <p>
+            Status:
+            <strong>
+                {{if .Loaded}}
+                    performance loaded
+                {{else}}
+                    awaiting upload
+                {{end}}
+            </strong>
+        </p>
         <br>
         <form method="post" enctype="multipart/form-data">
             {{if .Error}}

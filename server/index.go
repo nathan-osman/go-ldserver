@@ -17,6 +17,9 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 		}
 		switch r.Form.Get("action") {
 		case "upload":
+			if s.presenter != nil {
+				s.presenter.Stop()
+			}
 			r, _, err := r.FormFile("file")
 			if err != nil {
 				data["Error"] = err.Error()

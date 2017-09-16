@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"io"
+	"sync"
 	"time"
 
 	"github.com/nathan-osman/go-ldserver/manager"
@@ -9,6 +10,7 @@ import (
 
 // Presenter runs a performance, executing each of the events in realtime.
 type Presenter struct {
+	mutex     sync.Mutex
 	perf      performance
 	stopCh    chan bool
 	stoppedCh chan bool
@@ -34,19 +36,29 @@ func NewPresenter(m manager.Manager, r io.Reader) (*Presenter, error) {
 		return nil, err
 	}
 	return &Presenter{
-		perf:      p,
-		stopCh:    make(chan bool),
-		stoppedCh: make(chan bool),
+		perf: p,
 	}, nil
 }
 
 // Start begins the performance.
 func (p *Presenter) Start() {
-	go p.run()
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	if p.stoppedCh == nil {
+		p.stopCh = make(chan bool)
+		p.stoppedCh = make(chan bool)
+		go p.run()
+	}
 }
 
 // Stop ends the performance.
 func (p *Presenter) Stop() {
-	close(p.stopCh)
-	<-p.stoppedCh
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	if p.stopCh != nil {
+		close(p.stopCh)
+		<-p.stoppedCh
+		p.stopCh = nil
+		p.stoppedCh = nil
+	}
 }
