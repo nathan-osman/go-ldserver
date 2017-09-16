@@ -14,11 +14,11 @@ type Light interface {
 func newLight(lCfg *lightConfig) (Light, error) {
 	switch lCfg.Type {
 	case "debug":
-		l := &debugLight{}
-		if err := json.Unmarshal(lCfg.Config, l); err != nil {
+		c := &debugConfig{}
+		if err := json.Unmarshal(lCfg.Config, c); err != nil {
 			return nil, err
 		}
-		return l, nil
+		return newDebugLight(c.Name), nil
 	case "gpio":
 		c := &gpioConfig{}
 		if err := json.Unmarshal(lCfg.Config, c); err != nil {

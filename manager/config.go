@@ -14,6 +14,10 @@ type lightConfig struct {
 	Config json.RawMessage `json:"config"`
 }
 
+type debugConfig struct {
+	Name string `json:"name"`
+}
+
 type gpioConfig struct {
 	Number int `json:"number"`
 }

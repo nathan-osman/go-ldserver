@@ -1,15 +1,21 @@
 package manager
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
 )
 
 type debugLight struct {
-	Name string `json:"name"`
+	log *logrus.Entry
+}
+
+func newDebugLight(name string) *debugLight {
+	return &debugLight{
+		log: logrus.WithField("context", name),
+	}
 }
 
 func (d *debugLight) SetState(state bool) {
-	fmt.Printf("[%s] state: %v\n", d.Name, state)
+	d.log.Infof("state: %v", state)
 }
 
 func (d *debugLight) Close() {}

@@ -56,4 +56,7 @@ func NewServer(cfg *Config, m manager.Manager) (*Server, error) {
 func (s *Server) Close() {
 	s.listener.Close()
 	<-s.stoppedCh
+	if s.presenter != nil {
+		s.presenter.Stop()
+	}
 }
