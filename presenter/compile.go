@@ -2,7 +2,6 @@ package presenter
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -27,7 +26,7 @@ func compile(m manager.Manager, r io.Reader) (performance, error) {
 		}
 		l, ok := m[name]
 		if !ok {
-			return nil, errors.New("invalid light specified")
+			return nil, fmt.Errorf("invalid light \"%s\" specified", name)
 		}
 		p = append(p, &event{
 			light:  l,

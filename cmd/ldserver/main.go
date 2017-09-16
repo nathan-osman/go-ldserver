@@ -25,7 +25,7 @@ func main() {
 			return err
 		}
 		defer m.Close()
-		s, err := server.NewServer(&c.Server)
+		s, err := server.NewServer(&c.Server, m)
 		if err != nil {
 			return err
 		}

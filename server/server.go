@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/nathan-osman/go-ldserver/manager"
+	"github.com/nathan-osman/go-ldserver/presenter"
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,6 +14,8 @@ import (
 type Server struct {
 	listener  net.Listener
 	server    *http.Server
+	manager   manager.Manager
+	presenter *presenter.Presenter
 	log       *logrus.Entry
 	stoppedCh chan bool
 }
@@ -26,7 +30,7 @@ func (s *Server) run() {
 }
 
 // NewServer creates a new web server.
-func NewServer(cfg *Config) (*Server, error) {
+func NewServer(cfg *Config, m manager.Manager) (*Server, error) {
 	l, err := net.Listen("tcp", cfg.Addr)
 	if err != nil {
 		return nil, err
@@ -38,10 +42,12 @@ func NewServer(cfg *Config) (*Server, error) {
 			server: &http.Server{
 				Handler: router,
 			},
+			manager:   m,
 			log:       logrus.WithField("context", "server"),
 			stoppedCh: make(chan bool),
 		}
 	)
+	router.HandleFunc("/", s.index)
 	go s.run()
 	return s, nil
 }
