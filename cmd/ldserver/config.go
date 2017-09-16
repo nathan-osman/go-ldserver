@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/nathan-osman/go-ldserver/manager"
+	"github.com/nathan-osman/go-ldserver/server"
 )
 
 type Config struct {
-	Manager *manager.Config `json:"manager"`
+	Manager manager.Config `json:"manager"`
+	Server  server.Config  `json:"server"`
 }
 
 func LoadConfig(name string) (*Config, error) {

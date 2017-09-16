@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/nathan-osman/go-ldserver/manager"
+	"github.com/nathan-osman/go-ldserver/server"
 )
 
 func main() {
@@ -19,11 +20,16 @@ func main() {
 		if err != nil {
 			return err
 		}
-		m, err := manager.NewManager(c.Manager)
+		m, err := manager.NewManager(&c.Manager)
 		if err != nil {
 			return err
 		}
 		defer m.Close()
+		s, err := server.NewServer(&c.Server)
+		if err != nil {
+			return err
+		}
+		defer s.Close()
 		sigCh := make(chan os.Signal)
 		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 		<-sigCh
