@@ -5,13 +5,23 @@ import (
 )
 
 type debugLight struct {
-	log *logrus.Entry
+	name string
+	log  *logrus.Entry
 }
 
-func newDebugLight(name string) *debugLight {
-	return &debugLight{
-		log: logrus.WithField("context", name),
+func newDebugLights(cfg *debugConfig) []Light {
+	lights := []Light{}
+	for _, n := range cfg.Names {
+		lights = append(lights, &debugLight{
+			name: n,
+			log:  logrus.WithField("context", n),
+		})
 	}
+	return lights
+}
+
+func (d *debugLight) GetName() string {
+	return d.name
 }
 
 func (d *debugLight) SetState(state bool) {

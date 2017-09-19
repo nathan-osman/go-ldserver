@@ -7,24 +7,31 @@ import (
 
 // Light is the interface that each type of light must implement.
 type Light interface {
+	GetName() string
 	SetState(bool)
 	Close()
 }
 
-func newLight(lCfg *lightConfig) (Light, error) {
-	switch lCfg.Type {
+func newLights(lType string, lCfg json.RawMessage) ([]Light, error) {
+	switch lType {
 	case "debug":
 		c := &debugConfig{}
-		if err := json.Unmarshal(lCfg.Config, c); err != nil {
+		if err := json.Unmarshal(lCfg, c); err != nil {
 			return nil, err
 		}
-		return newDebugLight(c.Name), nil
+		return newDebugLights(c), nil
 	case "gpio":
 		c := &gpioConfig{}
-		if err := json.Unmarshal(lCfg.Config, c); err != nil {
+		if err := json.Unmarshal(lCfg, c); err != nil {
 			return nil, err
 		}
-		return newGPIOLight(c.Number)
+		return newGPIOLights(c)
+	case "ws":
+		c := &wsConfig{}
+		if err := json.Unmarshal(lCfg, c); err != nil {
+			return nil, err
+		}
+		return newWSLights(c)
 	default:
 		return nil, errors.New("invalid light type")
 	}

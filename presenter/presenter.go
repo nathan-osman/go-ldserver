@@ -11,6 +11,7 @@ import (
 // Presenter runs a performance, executing each of the events in realtime.
 type Presenter struct {
 	mutex     sync.Mutex
+	manager   manager.Manager
 	perf      performance
 	stopCh    chan bool
 	stoppedCh chan bool
@@ -36,7 +37,8 @@ func NewPresenter(m manager.Manager, r io.Reader) (*Presenter, error) {
 		return nil, err
 	}
 	return &Presenter{
-		perf: p,
+		manager: m,
+		perf:    p,
 	}, nil
 }
 
@@ -58,6 +60,7 @@ func (p *Presenter) Stop() {
 	if p.stopCh != nil {
 		close(p.stopCh)
 		<-p.stoppedCh
+		p.manager.Reset()
 		p.stopCh = nil
 		p.stoppedCh = nil
 	}

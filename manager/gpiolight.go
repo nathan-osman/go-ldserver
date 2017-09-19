@@ -5,17 +5,38 @@ import (
 )
 
 type gpioLight struct {
-	pin *rpi.Pin
+	name string
+	pin  *rpi.Pin
 }
 
-func newGPIOLight(number int) (*gpioLight, error) {
-	p, err := rpi.OpenPin(number, rpi.OUT)
+func newGPIOLights(cfg *gpioConfig) ([]Light, error) {
+	var (
+		lights = []Light{}
+		err    = func() error {
+			for _, c := range cfg.Pins {
+				p, err := rpi.OpenPin(c.Number, rpi.OUT)
+				if err != nil {
+					return err
+				}
+				lights = append(lights, &gpioLight{
+					name: c.Name,
+					pin:  p,
+				})
+			}
+			return nil
+		}()
+	)
 	if err != nil {
+		for _, l := range lights {
+			l.Close()
+		}
 		return nil, err
 	}
-	return &gpioLight{
-		pin: p,
-	}, nil
+	return lights, nil
+}
+
+func (g *gpioLight) GetName() string {
+	return g.name
 }
 
 func (g *gpioLight) SetState(state bool) {
